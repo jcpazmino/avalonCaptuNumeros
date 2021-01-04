@@ -24,7 +24,7 @@ var avalon = {
 }
 var numeros = {
     arrNumeros:[], 
-    cantidad:8,
+    cantidad:4,
     numeroMin:1, numeroMax:15
 };
 var elemento= {numero:0, posX:0, posY:0};

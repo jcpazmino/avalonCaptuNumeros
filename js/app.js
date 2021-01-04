@@ -5,9 +5,9 @@
 })();
 
 function cargarImagenes (){
+    avalon.frente.src = avalon.path_imgs.frente + "frente1.png";
     avalon.atras.src = avalon.path_imgs.atras + "atras1.png";
     avalon.derecha.src = avalon.path_imgs.derecha + "derecha1.png";
-    avalon.frente.src = avalon.path_imgs.frente + "frente1.png";
     avalon.izquierda.src = avalon.path_imgs.izquierda + "izquierda1.png";
     backgroundImage.src = "./imgs/fondo.jpg";
 }
@@ -15,11 +15,11 @@ cargarImagenes ();
 backgroundImage.addEventListener('load', iniciar, false);
 
 //****** falta realizar una precarga de imágenes para que funcione adecuadamente al principio */
-function iniciar() {
-    ctx.drawImage(backgroundImage, 0, 0);   
-    ctx.drawImage(avalon.frente, avalon.posX, avalon.posY);
-    generaNumeros();
-    animacion();
+function iniciar() {        
+        ctx.drawImage(backgroundImage, 0, 0);
+        ctx.drawImage(avalon.frente, avalon.posX, avalon.posY);    
+        generaNumeros();
+        animacion();
 }
 function animacion(){
     time_avalon=setTimeout(function() {  
@@ -27,15 +27,29 @@ function animacion(){
             if(!avalon.parado.frente) mueveFrente();
             if(!avalon.parado.atras) mueveAtras();  
             if(!avalon.parado.derecha) mueveDerecha();    
-            if(!avalon.parado.izquierda) mueveIzquierda();      
-            dispNumero();    
-            controlColicion_numeros();   
+            if(!avalon.parado.izquierda) mueveIzquierda(); 
+            if(numeros.arrNumeros.length>0){   
+                dispNumero();    
+                controlColision_numeros();  
+            } else{
+                pararAnimacion();
+            }
         }else{           
             controlLimites_escenario();
         }
         id_Animation = window.requestAnimationFrame(animacion); 
     }, 1000 / fotogramasPorSegundo);
-
+    //*** para animación al recoger todos los números */
+    this.pararAnimacion = function(){
+        avalon.parado.frente=true;avalon.parado.atras=true;avalon.parado.derecha=true;avalon.parado.izquierda=true;       
+        control_AudioCaminando(false);
+        clearTimeout(id_Animation);   
+        avalon.frente.src = avalon.path_imgs.frente + "sentada.png";          
+        ctx.drawImage(backgroundImage, 0, 0);   
+        ctx.drawImage(avalon.frente, 300, 150);
+        ctx.font = "50px Georgia";
+        ctx.fillText("Se ha terminado!", 100, 150);
+    }
     //***** se ejecuta cuando el objeto llego a uno de los extermos del escenario */
     this.controlLimites_escenario = function(){
         avalon.parado.frente=true;avalon.parado.atras=true;avalon.parado.derecha=true;avalon.parado.izquierda=true;
@@ -46,9 +60,8 @@ function animacion(){
         if(avalon.posY<=yMin) avalon.posY = yMin+factorY;
         if(avalon.posY>=yMax) avalon.posY = yMax-factorY;      
     }
-    this.controlColicion_numeros = function(){
-        o_ancho= avalon.ancho; o_alto= avalon.alto;
-        area_ancho=avalon.posX+o_ancho;area_alto=avalon.posY+o_alto;
+    this.controlColision_numeros = function(){
+        area_ancho=avalon.posX+avalon.ancho;area_alto=avalon.posY+avalon.alto;
         for(i=0; i<numeros.arrNumeros.length; i++){         
             x_numero=numeros.arrNumeros[i].posX; y_numero=numeros.arrNumeros[i].posY; numero= numeros.arrNumeros[i].numero;        
             if((x_numero>=avalon.posX && x_numero<=area_ancho) && (y_numero>=avalon.posY && y_numero<=area_alto)){
